@@ -1,15 +1,16 @@
-//var listener = new cc.EventListener({
-//    event: cc.EventListener.TOUCH_ONE_BY_ONE,
-//    swallowTouches: TRUE,
-//    onTouchBegan: function(touch,event){
-//        startTouch = touch.getLocation();
-//        return true;
-//    },
-//    onTouchEnded:function(touch,event){
-//        endTouch = touch.getLocation();
-//        swipeDiretion();
-//    }
-//});
+var listener = cc.EventListener.create({
+    event: cc.EventListener.TOUCH_ONE_BY_ONE,
+    swallowTouches: true,
+    onTouchBegan: function(touch,event){
+        startTouch = touch.getLocation();
+        return true;
+    }
+    ,
+    onTouchEnded:function(touch,event){
+        endTouch = touch.getLocation();
+        swipeDiretion();
+    }
+});
 
 
 var GameLayer = cc.Layer.extend({
@@ -54,7 +55,7 @@ var GameLayer = cc.Layer.extend({
             }
         }
 
-        //cc.eventManager.addListener( listener, this );
+        cc.eventManager.addListener( listener, this );
 
     }
 });
@@ -67,20 +68,53 @@ function swipeDiretion(){
     if( Math.abs(distX) + Math.abs(distY) > swipeTolerance){
         if(Math.abs(distX) > Math.abs(distY)){
             if(distX>0){
-                playerSprite.setPosition(playerSprite.getPosition().x-25,playerSprite.getPosition().y);
+                //playerSprite.setPosition(playerSprite.getPosition().x-25,playerSprite.getPosition().y);
+                move(-1,0);
             }
             else {
-                playerSprite.setPosition(playerSprite.getPosition().x+25,playerSprite.getPosition().y);
+                //playerSprite.setPosition(playerSprite.getPosition().x+25,playerSprite.getPosition().y);
+                move(1,0);
             }
         }
         else{
             if(distY>0){
-                playerSprite.setPosition(playerSprite.getPosition().x,playerSprite.getPosition().y-25);
+                //playerSprite.setPosition(playerSprite.getPosition().x,playerSprite.getPosition().y-25);
+                move(0,1);
             }
             else {
-                playerSprite.setPosition(playerSprite.getPosition().x,playerSprite.getPosition().y+25);
+                //playerSprite.setPosition(playerSprite.getPosition().x,playerSprite.getPosition().y+25);
+                move(0,-1);
             }
         }
     }
 
+}
+
+function move(deltaX,deltaY) {
+    switch(level[playerPosition.y+deltaY][playerPosition.x+deltaX]) {
+        case 0:
+        case 2:
+            level[playerPosition.y][playerPosition.x] -= 4;
+            playerPosition.x += deltaX;
+            playerPosition.y += deltaY;
+            level[playerPosition.y][playerPosition.x] += 4;
+            playerSprite.setPosition(165+25*playerPosition.x, 185-25*playerPosition.y);
+            break;
+        case 3:
+        case 5:
+            if(level[playerPosition.y+deltaY*2][playerPosition.x+deltaX*2] == 2
+            || level[playerPosition.y+deltaY*2][playerPosition.x+deltaX*2] == 0){
+                level[playerPosition.y][playerPosition.x] -= 4;
+                playerPosition.x += deltaX;
+                playerPosition.y += deltaY;
+                level[playerPosition.y][playerPosition.x] += 1;
+                playerSprite.setPosition(165+25*playerPosition.x, 185-25*playerPosition.y);
+                level[playerPosition.y+deltaY][playerPosition.x+deltaX] += 3;
+                var movingCrate = crateArray[playerPosition.y][[playerPosition.x]];
+                movingCrate.setPosition( movingCrate.getPosition().x+25*deltaX, movingCrate.getPosition().y-25*deltaY);
+                crateArray[playerPostion.y+deltaY][playerPostion.x_deltaX]= movingCrate;
+                crateArray[playerPostion.y][playerPostion.x]= movingCrate;
+            }
+            break;
+    }
 }
